@@ -1,0 +1,31 @@
+{
+  "name": "pi-lobotomy",
+  "version": "0.1.0",
+  "description": "Angela-coordinated coding teams for Pi, with asynchronous tmux subagents",
+  "files": ["pi-extension/", "agents/", "config.json.example", "docs/", "README.md", "LICENSE"],
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=22.19.0" },
+  "scripts": {
+    "test": "node --test test/*.test.ts test/test.ts",
+    "test:tmux": "node --test --test-concurrency=1 test/integration/tmux-surface.test.ts test/integration/coordination-lifecycle.test.ts",
+    "test:integration": "node --test --test-concurrency=1 test/integration/*.test.ts",
+    "check": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "0.99.1",
+    "@earendil-works/pi-tui": "0.99.1",
+    "typebox": "1.3.27",
+    "typescript": "^5.9.3",
+    "@types/node": "^22.19.19"
+  },
+  "pi": {
+    "extensions": ["./pi-extension/subagents/index.ts"]
+  }
+}
