@@ -96,7 +96,7 @@ function getModuleAbortSignal(): AbortSignal {
 const SubagentParams = Type.Object({
   agent: Type.String({
     description:
-      "Which role to spawn (e.g. 'malkuth', 'yesod', 'hod'). This loads the agent's " +
+      "Agent name (e.g. 'Yesod', 'Hod') or team (e.g. 'information', 'training'), case-insensitive. This loads the agent's " +
       "fixed profile — its model, tool loadout, and system prompt. Must be one of the available agents.",
   }),
   task: Type.String({ description: "Bounded task with necessary context and expected output" }),
@@ -408,7 +408,31 @@ function resolveEffectiveInteractive(
   return !(agentDefs?.autoExit ?? false);
 }
 
+const TEAM_AGENTS: Record<string, string> = {
+  information: "yesod",
+  safety: "netzach",
+  training: "hod",
+  disciplinary: "gebura",
+  welfare: "chesed",
+  extraction: "binah",
+  bongbong: "employee",
+};
+
+function resolveAgentName(requested: string): string {
+  const agents = discoverAgentDefinitions();
+  // Actual names take precedence over convenience aliases, including custom profiles.
+  const exact = agents.find((agent) => agent.name === requested);
+  if (exact) return exact.name;
+  const normalized = requested.trim().toLowerCase();
+  const matches = agents.filter((agent) => agent.name.toLowerCase() === normalized);
+  if (matches.length === 1) return matches[0].name;
+  if (matches.length > 1) return requested;
+  const alias = TEAM_AGENTS[normalized];
+  return alias && agents.some((agent) => agent.name === alias) ? alias : requested;
+}
+
 function loadAgentDefaults(agentName: string): AgentDefaults | null {
+  agentName = resolveAgentName(agentName);
   const configDir = getAgentConfigDir();
   const paths = [
     join(process.cwd(), ".pi", "agents", `${agentName}.md`),
@@ -1134,6 +1158,7 @@ export const __test__ = {
   getShellReadyDelayMs,
   renderSubagentWidgetLines,
   loadAgentDefaults,
+  resolveAgentName,
   discoverAgentDefinitions,
   resolveEffectiveSessionMode,
   resolveLaunchBehavior,
@@ -1782,7 +1807,9 @@ export default function subagentsExtension(pi: ExtensionAPI) {
             ],
             details: { error: "agent required" },
           };
-        } else if (!permittedSet.has(params.agent)) {
+        }
+        params.agent = resolveAgentName(params.agent);
+        if (!permittedSet.has(params.agent)) {
           return {
             content: [
               {
@@ -2402,7 +2429,7 @@ export default function subagentsExtension(pi: ExtensionAPI) {
       }
 
       const spaceIdx = trimmed.indexOf(" ");
-      const agentName = spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx);
+      const agentName = resolveAgentName(spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx));
       const task = spaceIdx === -1 ? "" : trimmed.slice(spaceIdx + 1).trim();
 
       const defs = loadAgentDefaults(agentName);

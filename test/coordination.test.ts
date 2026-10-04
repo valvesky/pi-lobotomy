@@ -126,7 +126,7 @@ describe("coding team", () => {
       assert.match((event.systemPromptOptions.sections as any).angela, /Team membership does not itself grant delegation permission/);
       for (const id of roles) {
         const personalName = id[0].toUpperCase() + id.slice(1);
-        assert.ok((event.systemPromptOptions.sections as any).angela.includes(`- ${personalName} (\`${id}\`):`));
+        assert.ok((event.systemPromptOptions.sections as any).angela.includes(`- ${personalName} (\`${personalName}\` or `));
       }
       process.env.PI_SUBAGENT_AGENT = "gebura";
       assert.equal(create().has("before_agent_start"), false);

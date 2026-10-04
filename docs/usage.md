@@ -6,23 +6,23 @@ The parent receives Angela's coordination instructions. The extension does not c
 
 ## Team
 
-Angela, Yesod, Netzach, Hod, Gebura, Chesed, and Binah are personal names, not role titles. Each member's role is their associated team. A worker spawned by a member belongs to that member's team: for example, a worker spawned by Yesod is part of the Information Team. This describes team membership, not delegation permission; bundled profiles still cannot spawn workers. Use their lowercase profile IDs in tool calls.
+Angela, Yesod, Netzach, Hod, Gebura, Chesed, and Binah are personal names, not role titles. Each member's role is their associated team. A worker spawned by a member belongs to that member's team: for example, a worker spawned by Yesod is part of the Information Team. This describes team membership, not delegation permission; bundled profiles still cannot spawn workers. Use their names directly in commands and tool calls, case-insensitively. Team aliases work too; existing lowercase names remain compatible. Custom profile names take precedence over team aliases.
 
-| Name | Profile ID | Team | Responsibility | Tools |
+| Name | Team alias | Team | Responsibility | Tools |
 |---|---|---|---|---|
 | Angela | Parent session | Coordinator | Scope, ownership, reconciliation, integration, reporting | Parent's existing tools + coordination |
-| Yesod | `yesod` | Information | Research and evidence-backed investigation (low thinking) | Read/search + bash for read-only rg/fzf |
-| Netzach | `netzach` | Safety | Failure paths, cleanup, cancellation, resource lifetimes | Read/search only |
-| Hod | `hod` | Training | Regression tests and behavior verification | Read/search, edit/write, bash |
-| Gebura | `gebura` | Disciplinary | Fast codebase scouting and handoff (low thinking) | Read/search only |
-| Chesed | `chesed` | Welfare | Documentation and developer workflows | Read/search, edit/write, bash |
-| Binah | `binah` | Extraction | Code review, correctness, and complexity reduction | Read/search only |
+| Yesod | `information` | Information | Research and evidence-backed investigation (low thinking) | Read/search + bash for read-only rg/fzf |
+| Netzach | `safety` | Safety | Failure paths, cleanup, cancellation, resource lifetimes | Read/search only |
+| Hod | `training` | Training | Regression tests and behavior verification | Read/search, edit/write, bash |
+| Gebura | `disciplinary` | Disciplinary | Fast codebase scouting and handoff (low thinking) | Read/search only |
+| Chesed | `welfare` | Welfare | Documentation and developer workflows | Read/search, edit/write, bash |
+| Binah | `extraction` | Extraction | Code review, correctness, and complexity reduction | Read/search only |
 
 Read/search means `read`, `grep`, `find`, and `ls`. Yesod additionally uses bash for read-only ripgrep (`rg`) and non-interactive `fzf`; these shell restrictions are instructions, not a sandbox. Read-only agents cannot run git or test commands; provide relevant diffs, history, or logs in the brief. Personalities affect tone, never correctness, care, or professionalism.
 
 The old bundled `scout`, `researcher`, and `worker` profiles are replaced by these six roles. Existing global or project profiles are still discoverable and override package profiles by name: **project > global > package**. Bundled roles have no recursive spawning permission and all default to **`openai-codex/gpt-6-luna`**. An explicit assignment model or overriding custom profile can change that. Custom profiles without a model inherit the parent's selected model; resumes replay their original model. The child must be able to resolve that model without the parent's unrelated extensions.
 
-BongBong (the personal `employee` profile) uses `openai-codex/gpt-6.1-sol` with `xhigh` thinking, writes code within an explicit scope, and asks questions when blocked. It does not perform independent reviews; assign those to Binah.
+BongBong, when installed as a personal profile, can be requested as `BongBong` (the legacy `employee` name remains compatible). It uses `openai-codex/gpt-6.1-sol` with `xhigh` thinking, writes code within an explicit scope, and asks questions when blocked. It does not perform independent reviews; assign those to Binah.
 
 ## Assignment tools
 
@@ -30,11 +30,11 @@ BongBong (the personal `employee` profile) uses `openai-codex/gpt-6.1-sol` with 
 - `subagent_message`: steer a running agent, answer its question, or resume a finished session by its persistent name.
 - `subagents_list`: discover role definitions, not runtime progress.
 - `ask_question`: available in child sessions; parks the child until the parent replies.
-- `/subagent <profile-id> <task>`: request a launch from the parent; Angela supplies writer scopes as needed.
+- `/subagent <name-or-team> <task>`: request a launch from the parent; Angela supplies writer scopes as needed.
 
 ```ts
 subagent({
-  agent: "chesed",
+  agent: "Chesed",
   name: "cancel-fix",
   task: "Fix cancellation so the current operation releases its resources. Inspect the relevant contracts first.",
   write_scope: ["src/operation.ts"],
@@ -43,7 +43,7 @@ subagent({
 });
 
 subagent({
-  agent: "hod",
+  agent: "Hod",
   task: "Add a regression test for cancellation cleanup. The implementation is assigned separately; do not change it.",
   write_scope: ["test/operation.test.ts"],
   checks: ["Test fails against the old behavior and passes with the fix"],

@@ -6,41 +6,34 @@
 
 [![BongBong dancing from Lobotomy Corporation](https://media1.tenor.com/m/c8WDVFXXQlMAAAAC/bongbong-lobotomy-corp.gif)](https://tenor.com/view/bongbong-lobotomy-corp-lobotomy-corporation-gif-26193236)
 
-Angela-coordinated coding teams for [Pi](https://pi.dev), with asynchronous subagents in tmux panes. Bundled roles cover research, scouting, testing, documentation, safety, and review.
+Lobotomy Corporation inspired coding subagents for [Pi](https://pi.dev).
+
+This plugin is **tmux only!**
 
 ## Install
 
-Requires **Pi 0.99.1+**, **Node.js 22.19+**, and **tmux**. Run Pi inside a tmux session to launch subagents.
-
-From a checkout:
-
 ```sh
-pi install /absolute/path/to/pi-lobotomy
+git clone https://github.com/valvesky/pi-lobotomy
+pi install pi-lobotomy
 ```
-
-Restart Pi, then start working from your target project's directory. No build step, profile copying, or theme setup is needed. Local installs load the checkout directly; `npm ci` is only needed for development checks.
-
-To install only for one project, run `pi install --local /absolute/path/to/pi-lobotomy` from that project.
-
-Do not load this alongside `pi-interactive-subagents`: they register the same tools. Remove the old package first with `pi remove <old-source>`. If you installed this checkout before it was renamed, replace its old `pi-angela` path in your Pi package settings.
 
 ## Use
 
-Ask Pi to delegate, or request a team member directly using their profile ID:
+Ask Pi to delegate by name, or request a team member directly (names are case-insensitive):
 
 ```text
-/subagent gebura Map the authentication code and report the important files.
+/subagent Gebura Map the authentication code and report the important files.
 ```
 
-| Name | Profile ID | Focus |
+| Name | Team alias | Focus |
 |---|---|---|
 | Angela | Parent session | Coordination: scope, integration, reporting |
-| Yesod | `yesod` | Research and evidence |
-| Gebura | `gebura` | Fast codebase scouting |
-| Netzach | `netzach` | Safety and failure paths |
-| Hod | `hod` | Tests and verification |
-| Chesed | `chesed` | Documentation and workflows |
-| Binah | `binah` | Code review |
+| Yesod | `information` | Research and evidence |
+| Gebura | `disciplinary` | Fast codebase scouting |
+| Netzach | `safety` | Safety and failure paths |
+| Hod | `training` | Tests and verification |
+| Chesed | `welfare` | Documentation and workflows |
+| Binah | `extraction` | Code review |
 
 Results arrive automatically. The parent can steer agents with `subagent_message`; children can ask the parent questions. Writers require explicit file ownership (`write_scope`), and overlapping sibling assignments are rejected. Three assignments can run at once by default.
 

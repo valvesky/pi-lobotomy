@@ -1368,6 +1368,19 @@ describe("subagent discovery", () => {
     );
   });
 
+  it("accepts BongBong and preserves custom names over team aliases", async () => {
+    await withIsolatedAgentEnv(async ({ projectAgentsDir }) => {
+      writeAgentFile(projectAgentsDir, "employee", "name: employee\nmodel: test/writer");
+      assert.equal(testApi.resolveAgentName("BongBong"), "employee");
+      assert.equal(testApi.loadAgentDefaults("BongBong")?.model, "test/writer");
+      writeAgentFile(projectAgentsDir, "information", "name: information\nmodel: test/custom");
+      assert.equal(testApi.resolveAgentName("Information"), "information");
+      assert.equal(testApi.loadAgentDefaults("Information")?.model, "test/custom");
+      writeAgentFile(projectAgentsDir, "bongbong", "name: bongbong\nmodel: test/personal");
+      assert.equal(testApi.resolveAgentName("BongBong"), "bongbong");
+    });
+  });
+
   it("lists visible agents from discovery", async () => {
     await withIsolatedAgentEnv(async ({ projectAgentsDir }) => {
       writeAgentFile(
@@ -1815,6 +1828,26 @@ describe("commands", () => {
     assert.equal(sentUserMessages.length, 1);
     assert.match(sentUserMessages[0], /agent: "yesod"/);
     assert.match(sentUserMessages[0], /map the auth code/);
+  });
+
+  it("/subagent accepts personal names and team aliases case-insensitively", () => {
+    const { api, registeredCommands, sentUserMessages } = createMockExtensionApi();
+    (subagentsModule as any).default(api);
+    const command = registeredCommands.find((command) => command.name === "subagent");
+    for (const requested of ["Yesod", "YESOD", "Information", "INFORMATION"]) {
+      command.handler(`${requested} investigate`, { ui: { notify() {} } });
+    }
+    assert.equal(sentUserMessages.length, 4);
+    for (const message of sentUserMessages) assert.match(message, /agent: "yesod"/);
+  });
+
+  it("resolves each bundled team without changing unknown names", () => {
+    const { resolveAgentName } = (subagentsModule as any).__test__;
+    for (const [team, name] of Object.entries({ information: "yesod", safety: "netzach", training: "hod", disciplinary: "gebura", welfare: "chesed", extraction: "binah" })) {
+      assert.equal(resolveAgentName(team.toUpperCase()), name);
+      assert.equal(resolveAgentName(name.toUpperCase()), name);
+    }
+    assert.equal(resolveAgentName("not-a-profile"), "not-a-profile");
   });
 
   it("does not register the removed /iterate or /plan commands", () => {
